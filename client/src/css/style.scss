@@ -1,0 +1,81 @@
+@use 'node_modules/wt-frontend/build/global/theme' with (
+    $primary-color: #ffc800,
+    $background-color: rgb(64, 69, 78),//#d9d6cc,
+    $navbar-background-color: #353a44,//rgb(64, 69, 78),
+    $sidebar-background-color: #2b2e36,//#353a44,
+    $text-color: #e9edf0,
+    $modal-background: rgb(64, 69, 78),
+    $modal-section-padding: 24px,
+    $modal-radius: 4px,
+    $modal-border: 1px solid rgb(87, 93, 105),
+    $modal-button-color: rgba(255,255,255, 0.7),
+    $modal-button-hover: #e9edf0,
+    $button-text-color: black,
+    // other variable changes here
+);
+
+@use 'node_modules/wt-frontend/build/global/wolfie' as *;
+@use 'node_modules/wt-frontend/build/global/components';
+
+html, body {
+    margin: 0;
+    font-family: 'Roboto';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: rgb(47, 47, 47);
+}
+
+.logo {
+	color: orange;
+    font-size: 0.7rem;
+    font-family: "Roboto Mono", monospace;
+    text-transform: uppercase;
+    font-weight: bold;
+} 
+
+.navbar-options {
+    
+    float: right;
+    color: plum;
+    font-size: 16px;
+}
+
+.welcome-navbar {
+    background-color: black;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 64px;
+    padding: 1rem 1rem;
+    color: white;  
+}
+
+.modal-error {
+    color: whitesmoke;
+    font-size: 14px;
+}
+
+.nothing-msg {
+    color: whitesmoke;
+}
+
+.modal-header {
+    background-color: red;
+    color: white;
+    text-align: center;
+    font-size: 20px;
+    border: 0px;
+}
+
+.signup-modal {
+    background-color: black;
+    border: 0px;
+}
+
+.modal-input {
+    color: white;
+}
+
+.list-text{
+    font-size: 15px;
+}
