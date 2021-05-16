@@ -26,11 +26,11 @@ const Region = (props) => {
 	if(loading) { console.log(loading, 'loading'); }
 	if(error) { console.log(error, 'error'); }
     if(data) { 
-		// Assign todolists 
+	
 		for(let map of data.getAllMaps) {
 			maps.push(map)
 		}
-		//create data for sidebar links
+	
 		for(let map of maps) {
 			if(map) {
 				MapData.push({_id: map._id, name: map.name});
@@ -52,7 +52,8 @@ const Region = (props) => {
 		awaitRefetchQueries: true,
 		onCompleted: () => reloadList()
 	}
-
+    
+    console.log(maps);
     console.log(activeRegion);
 
     const [showUpdate, toggleShowUpdate] 	= useState(false);
@@ -62,6 +63,7 @@ const Region = (props) => {
 	const [Logout] = useMutation(LOGOUT);
 
     const [AddRegion] 			= useMutation(mutations.ADD_REGION, mutationOptions);
+    const [UpdateRegion]        = useMutation(mutations.UPDATE_REGION_FIELD, mutationOptions);
 
     const handleLogout = async (e) => {
         Logout();
@@ -91,6 +93,16 @@ const Region = (props) => {
         // $_id: String!, $index: Int!
         const { data } = await AddRegion({ variables: { region: newRegion, _id: activeRegionID, index: index}});
         setIndex(index+1);	
+	};
+
+    const editRegion = async (regionId, field, value, prev) => {
+        console.log("in edit");
+        const { data } = await UpdateRegion({ variables: { _id: activeRegionID, regionId: regionId, field: field, value: value}});
+        console.log(data);
+        refetch();
+		// let transaction = new EditItem_Transaction(listID, itemID, field, prev, value, flag, UpdateRegion);
+		// props.tps.addTransaction(transaction);
+		// tpsRedo();
 	};
 
     let tempID = 0;
@@ -133,15 +145,16 @@ const Region = (props) => {
             <WCard wLayout="header-content-footer" style={{ width: "1025px", height: "550px", position: "fixed", left: "16%", top: "20%"}} raised className="example-layout-labels">
                 <WCHeader style={{ backgroundColor: "red", color: "white"}}>
                     <WRow style={{paddingTop:"20px"}}>
+                        <WCol size="1" style={{textAlign:"center"}}></WCol>
                         <WCol size="2" style={{textAlign:"center"}}>Name</WCol>
-                        <WCol size="3" style={{textAlign:"center"}}>Capital</WCol>
+                        <WCol size="2" style={{textAlign:"center"}}>Capital</WCol>
                         <WCol size="2"style={{textAlign:"center"}}>Leader</WCol>
                         <WCol size="2"style={{textAlign:"center"}}>Flag</WCol>
                         <WCol size="3"style={{textAlign:"center"}}>Landmarks</WCol>
                     </WRow>
                 </WCHeader>
                 <WCContent style={{ backgroundColor: "grey", overflowY: "auto" }}>
-                  <RegionList activeList={activeRegion} />
+                  <RegionList activeList={activeRegion} editRegion={editRegion} />
                 </WCContent>
                 <WCFooter style={{ backgroundColor: "grey" }}>
                

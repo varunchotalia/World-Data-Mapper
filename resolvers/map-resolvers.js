@@ -82,23 +82,23 @@ module.exports = {
         },
         updateRegionField: async (_, args) => {
             const { _id, regionId, field} = args;
-			let { value } = args
+			let { value } = args;
 			const listId = new ObjectId(_id);
 			const found = await Map.findOne({_id: listId});
 			let listRegions = found.regions;
-			// if(flag === 1) {
-			// 	if(value === 'complete') { value = true; }
-			// 	if(value === 'incomplete') { value = false; }
-			// }
 			listRegions.map(region => {
 				if(region._id.toString() === regionId) {	
 					region[field] = value;
 				}
 			});
-			const updated = await Map.updateOne({_id: listId}, { region: listRegions })
-			if(updated) return (listRegions);
-			else return (found.regions);
+			console.log(listRegions);
+			const updated = await Map.updateOne({_id: listId}, { regions: listRegions });
+			if(updated){
+			 return (listRegions);
+			}
+			else{
+				 return (found.regions);
+			}
         }
-
     }
 }

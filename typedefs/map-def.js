@@ -23,7 +23,7 @@ const typeDefs = gql `
             deleteRegion(regionId: String!, _id: String!): [Region]
             deleteMap(_id: String!): Boolean
             updateMapField(_id: String!, field:String!, value:String!): String
-            updateRegionField(regionId: String!, _id: String!, field: String!, value: String!): [Region]
+            updateRegionField( _id: String!, regionId: String!, field: String!, value: String!): [Region]
         }
         input FieldInput {
             _id: String

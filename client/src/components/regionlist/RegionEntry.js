@@ -10,6 +10,9 @@ const RegionEntry = (props) => {
     const leader = data.leader;
     const landmarks = data.landmarks;
 
+    const [editingCapital, toggleCapitalEdit] = useState(false);
+    const [editingLeader, toggleLeaderEdit] = useState(false);
+
     const newTo ={
         pathname: `subregionview/${data._id}`,
         // param1: data,
@@ -19,11 +22,64 @@ const RegionEntry = (props) => {
         }
     };
 
+    const handleCapitalEdit = (e) => {
+        toggleCapitalEdit(false);
+        const newCap = e.target.value ? e.target.value: "No Capitl";
+        const prevCap = capital;
+        if(newCap !== prevCap){
+            props.editRegion(data._id, 'capital', newCap, prevCap);
+        }
+    }
+
+    const handleLeaderEdit = (e) => {
+        toggleLeaderEdit(false);
+        const newLeader = e.target.value ? e.target.value: "No Leader";
+        const prevLeader = leader;
+        if(newLeader !== prevLeader){
+            props.editRegion(data._id, 'leader', newLeader, prevLeader);
+        }
+    }
+    // onClick={() => props.deleteRegion(data, props.index)}
     return(
         <WRow style={{paddingTop:"20px", textAlign:"center"}}>
-        <WCol size="2" ><Link to={`/region/${data._id+1}`}>{name}</Link></WCol>
-        <WCol size="3" >{capital}</WCol>
-        <WCol size="2">{leader}</WCol>
+        <WCol size="1">
+        {/* <WButton className="table-entry-buttons"  wType="texted"> */}
+                    <i className="material-icons" style={{color:"red"}}>close</i>
+            {/* </WButton> */}
+        </WCol>
+        <WCol size="2" >
+            <Link to={`/subregion/${data._id}`}>{name}</Link>
+            </WCol>
+        
+        <WCol size="2" >
+            {
+                editingCapital || capital === ''
+                ? <WInput
+                className='table-input' onBlur={handleCapitalEdit}
+                // onKeyDown={(e) => {if(e.keyCode === 13) handleCapitalEdit(e)}}
+                autoFocus={true} defaultValue={capital} type='text'
+                inputClass="table-input-class"
+                />: <div className="table-text"
+                onClick={() => toggleCapitalEdit(!editingCapital)}
+                >{capital} 
+                </div> 
+            }
+        
+        </WCol>
+        <WCol size="2">
+        {
+                editingLeader || leader === ''
+                ? <WInput
+                className='table-input' onBlur={handleLeaderEdit}
+                onKeyDown={(e) => {if(e.keyCode === 13) handleLeaderEdit(e)}}
+                autoFocus={true} defaultValue={leader} type='text'
+                inputClass="table-input-class"
+                />: <div className="table-text"
+                onClick={() => toggleLeaderEdit(!editingLeader)}
+                >{leader} 
+                </div> 
+            }
+        </WCol>
         <WCol size="2" >Flag</WCol>
         <WCol size="3" ><Link to={newTo} >{landmarks[0]}, ...</Link></WCol>
     </WRow>

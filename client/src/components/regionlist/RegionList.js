@@ -16,7 +16,7 @@ const RegionList = (props) => {
                 entries.map((entry, index) => (
                     <RegionEntry
                         data={entry} key={entry._id} index={index} entryCount={entryCount}
-                        parentName={props.activeList.name}
+                        parentName={props.activeList.name} editRegion={props.editRegion}
                         // deleteItem={props.deleteItem} reorderItem={props.reorderItem}
                         // editItem={props.editItem}
                     />
