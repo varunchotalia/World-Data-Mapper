@@ -49,10 +49,10 @@ const MapEntry = (props) => {
                                 <Link to={`region/${props._id}`}>{props.name}</Link>
                                 </WCol>
                                 <WCol size="2">
-                                <i className="material-icons small" onClick={handleEditing}>edit</i>
+                                <i className="material-icons small" onClick={handleEditing} style={{cursor:"pointer"}}>edit</i>
                                 </WCol>
                                 <WCol size="2">
-                                <i className="material-icons small" onClick={() => toggleShowDeleteMap(true)}>delete</i>
+                                <i className="material-icons small" onClick={() => toggleShowDeleteMap(true)} style={{cursor:"pointer"}}>delete</i>
                                 </WCol>
                             </WRow>
             }

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { WButton, WInput, WRow, WCol } from 'wt-frontend';
 import {BrowserRouter as Router, Link,} from "react-router-dom";
+import DeleteRegion 							from '../modals/DeleteRegion';
+
 
 const RegionEntry = (props) => {
     const { data } = props;
@@ -10,8 +12,10 @@ const RegionEntry = (props) => {
     const leader = data.leader;
     const landmarks = data.landmarks;
 
+    const [showDeleteRegion, toggleShowDeleteRegion] 	= useState(false);
     const [editingCapital, toggleCapitalEdit] = useState(false);
     const [editingLeader, toggleLeaderEdit] = useState(false);
+    const [editingName, toggleNameEdit] = useState(false);
 
     const newTo ={
         pathname: `subregionview/${data._id}`,
@@ -39,28 +43,54 @@ const RegionEntry = (props) => {
             props.editRegion(data._id, 'leader', newLeader, prevLeader);
         }
     }
+
+    const handleNameEdit = (e) => {
+        toggleNameEdit(false);
+        const newName = e.target.value ? e.target.value: "No Name";
+        const prevName = name;
+        if(newName !== prevName){
+            props.editRegion(data._id, 'name', newName, prevName);
+        }
+    }
+
+    const handleDeleteRegion = () =>{
+        props.handleDeleteRegion(props._id, data);
+    }
+
     // onClick={() => props.deleteRegion(data, props.index)}
     return(
         <WRow style={{paddingTop:"20px", textAlign:"center"}}>
-        <WCol size="1">
-        {/* <WButton className="table-entry-buttons"  wType="texted"> */}
-                    <i className="material-icons" style={{color:"red"}}>close</i>
-            {/* </WButton> */}
-        </WCol>
-        <WCol size="2" >
-            <Link to={`/subregion/${data._id}`}>{name}</Link>
+            <WCol size="1">
+                <i className="material-icons" onClick={() => toggleShowDeleteRegion(true)} style={{color:"red", cursor:"pointer"}}>close</i>
             </WCol>
-        
+        {
+                editingName || name === '' 
+                ?<WCol size="2">
+                     <WInput
+                    className='table-input' onBlur={handleNameEdit}
+                    onKeyDown={(e) => {if(e.keyCode === 13) handleNameEdit(e)}}
+                    autoFocus={true} defaultValue={name} type='text'
+                    inputClass="table-input-class"
+                     />
+                    <i className="material-icons small" style={{color: "grey", pointerEvents: "none"}}>edit</i>
+                    <i className="material-icons small" onClick={() => toggleNameEdit(!editingName)}>edit</i>
+                </WCol>
+                : 
+                <WCol size="2">
+                     <Link to={`/subregion/${data._id}`}>{name}</Link>
+                     <i className="material-icons small" style={{cursor:"pointer", paddingLeft:"5px"}} onClick={() => toggleNameEdit(!editingName)}>edit</i>
+                </WCol> 
+        }
         <WCol size="2" >
             {
                 editingCapital || capital === ''
                 ? <WInput
                 className='table-input' onBlur={handleCapitalEdit}
-                // onKeyDown={(e) => {if(e.keyCode === 13) handleCapitalEdit(e)}}
+                onKeyDown={(e) => {if(e.keyCode === 13) handleCapitalEdit(e)}}
                 autoFocus={true} defaultValue={capital} type='text'
                 inputClass="table-input-class"
                 />: <div className="table-text"
-                onClick={() => toggleCapitalEdit(!editingCapital)}
+                onClick={() => toggleCapitalEdit(!editingCapital)} style={{cursor:"pointer"}}
                 >{capital} 
                 </div> 
             }
@@ -75,13 +105,14 @@ const RegionEntry = (props) => {
                 autoFocus={true} defaultValue={leader} type='text'
                 inputClass="table-input-class"
                 />: <div className="table-text"
-                onClick={() => toggleLeaderEdit(!editingLeader)}
+                onClick={() => toggleLeaderEdit(!editingLeader)} style={{cursor:"pointer"}}
                 >{leader} 
                 </div> 
             }
         </WCol>
         <WCol size="2" >Flag</WCol>
         <WCol size="3" ><Link to={newTo} >{landmarks[0]}, ...</Link></WCol>
+        {showDeleteRegion && <DeleteRegion deleteRegion={handleDeleteRegion} deleteRegionName={name} setShowDeleteRegion={toggleShowDeleteRegion} />}
     </WRow>
     );
 };

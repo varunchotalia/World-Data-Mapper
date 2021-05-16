@@ -49,7 +49,7 @@ const RegionViewer = (props) =>{
             <WLHeader>
                 <WNavbar className="welcome-navbar">
                     <ul>
-                        <WNavItem onClick={() => history.push("/maps")}>
+                        <WNavItem onClick={() => history.push("/maps")} style={{cursor:"pointer"}}>
                             <Logo className='logo' />
                         </WNavItem>
                     </ul>

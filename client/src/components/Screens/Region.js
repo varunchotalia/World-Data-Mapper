@@ -63,6 +63,7 @@ const Region = (props) => {
 	const [Logout] = useMutation(LOGOUT);
 
     const [AddRegion] 			= useMutation(mutations.ADD_REGION, mutationOptions);
+    const [DeleteRegion] 			= useMutation(mutations.DELETE_REGION, mutationOptions);
     const [UpdateRegion]        = useMutation(mutations.UPDATE_REGION_FIELD, mutationOptions);
 
     const handleLogout = async (e) => {
@@ -96,14 +97,16 @@ const Region = (props) => {
 	};
 
     const editRegion = async (regionId, field, value, prev) => {
-        console.log("in edit");
         const { data } = await UpdateRegion({ variables: { _id: activeRegionID, regionId: regionId, field: field, value: value}});
-        console.log(data);
-        refetch();
 		// let transaction = new EditItem_Transaction(listID, itemID, field, prev, value, flag, UpdateRegion);
 		// props.tps.addTransaction(transaction);
 		// tpsRedo();
 	};
+
+    const deleteRegion = async (regionId, region) => {
+        console.log("reached deleteregion");
+        const { data } = await DeleteRegion({ variables: { regionId: regionId, _id: activeRegionID}});
+    }
 
     let tempID = 0;
     return (
@@ -111,18 +114,18 @@ const Region = (props) => {
             <WLHeader>
                 <WNavbar className="welcome-navbar">
                     <ul>
-                        <WNavItem onClick={() => history.push("/maps")}>
+                        <WNavItem onClick={() => history.push("/maps")} style={{cursor:"pointer"}}>
                             <Logo className='logo' />
                         </WNavItem>
                     </ul>
                     <ul>
                         <WNavItem hoverAnimation="lighten">
-                            <WButton className="navbar-options"  onClick={setShowUpdate} wType="texted" > 
+                            <WButton className="navbar-options"  onClick={setShowUpdate} style={{cursor:"pointer"}} wType="texted" > 
                                  {auth?props.user.name:"Loading"}
                             </WButton>
                         </WNavItem>
                         <WNavItem hoverAnimation="lighten">
-                            <WButton className="navbar-options" onClick={handleLogout} style={{color:"white"}}  wType="texted" hoverAnimation="text-primary">
+                            <WButton className="navbar-options" onClick={handleLogout} style={{color:"white", cursor:"pointer"}}  wType="texted" hoverAnimation="text-primary">
                                 Logout
                             </WButton>
                         </WNavItem>
@@ -154,7 +157,7 @@ const Region = (props) => {
                     </WRow>
                 </WCHeader>
                 <WCContent style={{ backgroundColor: "grey", overflowY: "auto" }}>
-                  <RegionList activeList={activeRegion} editRegion={editRegion} />
+                  <RegionList activeList={activeRegion} editRegion={editRegion} deleteRegion={deleteRegion} />
                 </WCContent>
                 <WCFooter style={{ backgroundColor: "grey" }}>
                

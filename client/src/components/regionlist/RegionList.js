@@ -17,6 +17,7 @@ const RegionList = (props) => {
                     <RegionEntry
                         data={entry} key={entry._id} index={index} entryCount={entryCount}
                         parentName={props.activeList.name} editRegion={props.editRegion}
+                        _id={entry._id} handleDeleteRegion={props.deleteRegion}
                         // deleteItem={props.deleteItem} reorderItem={props.reorderItem}
                         // editItem={props.editItem}
                     />
