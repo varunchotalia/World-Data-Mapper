@@ -54,7 +54,7 @@ const RegionEntry = (props) => {
     }
 
     const handleDeleteRegion = () =>{
-        props.handleDeleteRegion(props._id, data);
+        props.handleDeleteRegion(data, props.index);
     }
 
     // onClick={() => props.deleteRegion(data, props.index)}

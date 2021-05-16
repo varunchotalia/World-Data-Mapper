@@ -10,7 +10,7 @@ import { WNavbar, WNavItem, WButton, WCard, WCContent, WCFooter, WCHeader, WInpu
 import { WLayout, WLHeader, WLMain, WLSide } from 'wt-frontend';
 import { useHistory, useParams } from "react-router-dom";
 import WMMain from 'wt-frontend/build/components/wmodal/WMMain';
-
+import { EditRegion_Transaction, UpdateRegions_Transaction } 				from '../../utils/jsTPS';
 
 const Region = (props) => {
     const history = useHistory();
@@ -20,6 +20,9 @@ const Region = (props) => {
     let { id } = useParams();
     const [activeRegionID, setActiveRegionID] 	= useState(id);
     const [index, setIndex] = useState(0);
+    const [canUndo, setCanUndo] = useState(props.tps.hasTransactionToUndo());
+	const [canRedo, setCanRedo] = useState(props.tps.hasTransactionToRedo());
+    const [disabled, toggleDisabled] = useState(false);
 
     const { loading, error, data, refetch } = useQuery(GET_DB_MAPS);
     let activeRegion = null;
@@ -79,6 +82,22 @@ const Region = (props) => {
 		toggleShowUpdate(!showUpdate);
 	};
 
+    const tpsUndo = async () => {
+		const ret = await props.tps.undoTransaction();
+		if(ret) {
+			setCanUndo(props.tps.hasTransactionToUndo());
+			setCanRedo(props.tps.hasTransactionToRedo());
+		}
+	}
+
+	const tpsRedo = async () => {
+		const ret = await props.tps.doTransaction();
+		if(ret) {
+			setCanUndo(props.tps.hasTransactionToUndo());
+			setCanRedo(props.tps.hasTransactionToRedo());
+		}
+	}
+
     const addRegion = async () => {
 		let list = activeRegion;
 		const newRegion = {
@@ -88,24 +107,55 @@ const Region = (props) => {
 			leader: 'No One',
 			landmarks: ["No landmarks"]
 		};
-		 let regionID = newRegion._id;
-		// let listID = activeRegion._id;
+        let opcode = 1;
+		let regionID = newRegion._id;
         console.log("regionid is "+regionID);
-        // $_id: String!, $index: Int!
-        const { data } = await AddRegion({ variables: { region: newRegion, _id: activeRegionID, index: index}});
+        let transaction = new UpdateRegions_Transaction(activeRegionID, regionID, newRegion, opcode, AddRegion, DeleteRegion);
+		props.tps.addTransaction(transaction);
+		tpsRedo();
+        //const { data } = await AddRegion({ variables: { region: newRegion, _id: activeRegionID, index: index}});
         setIndex(index+1);	
 	};
 
     const editRegion = async (regionId, field, value, prev) => {
-        const { data } = await UpdateRegion({ variables: { _id: activeRegionID, regionId: regionId, field: field, value: value}});
-		// let transaction = new EditItem_Transaction(listID, itemID, field, prev, value, flag, UpdateRegion);
-		// props.tps.addTransaction(transaction);
-		// tpsRedo();
+        //const { data } = await UpdateRegion({ variables: { _id: activeRegionID, regionId: regionId, field: field, value: value}});
+		let transaction = new EditRegion_Transaction(activeRegionID, regionId, field, prev, value, UpdateRegion);
+		props.tps.addTransaction(transaction);
+		tpsRedo();
 	};
 
-    const deleteRegion = async (regionId, region) => {
-        console.log("reached deleteregion");
-        const { data } = await DeleteRegion({ variables: { regionId: regionId, _id: activeRegionID}});
+    const deleteRegion = async (region, index) => {
+        //const { data } = await DeleteRegion({ variables: { regionId: regionId, _id: activeRegionID}});
+        let regionID = region._id;
+		let opcode = 0;
+		let regionToDelete = {
+			_id: region._id,
+			name: region.name,
+			capital: region.capital,
+			leader: region.leader,
+			landmarks: region.landmarks
+		}
+		let transaction = new UpdateRegions_Transaction(activeRegionID, regionID, regionToDelete, opcode, AddRegion, DeleteRegion, index);
+		props.tps.addTransaction(transaction);
+		tpsRedo();
+    }
+
+    const clickDisabled = () => { };
+
+    const undoOptions = {
+        className: disabled || !canUndo ? ' table-header-button-disabled ' : 'table-header-button',
+        onClick: disabled || !canUndo  ? clickDisabled : tpsUndo,
+        wType: "texted", 
+        clickAnimation: disabled || !canUndo ? "" : "ripple-light",  
+        shape: "rounded"
+    }
+
+    const redoOptions = {
+        className: disabled || !canRedo ? ' table-header-button-disabled ' : 'table-header-button ',
+        onClick: disabled || !canRedo   ? clickDisabled : tpsRedo, 
+        wType: "texted", 
+        clickAnimation: disabled || !canRedo ? "" : "ripple-light" ,
+        shape: "rounded"
     }
 
     let tempID = 0;
@@ -134,18 +184,26 @@ const Region = (props) => {
             {    
               activeRegion &&  
               
-              <WRow style= {{fontSize: "25px", paddingLeft: "246px", paddingTop: "60px"}}>
+              <WRow style= {{fontSize: "25px", paddingLeft: "246px", paddingTop: "50px"}}>
                 <WCol size="2">
-                        <i className="material-icons" onClick={addRegion} style={{color: "green"}} >add</i>
+                        <i className="material-icons" onClick={addRegion} style={{color: "green", cursor:"pointer"}} >add</i>
                 </WCol>
-                <WCol size="2"></WCol>
-                
-                <WCol> Region:</WCol>
+                <WCol size="1">
+                    <WButton {...undoOptions}>
+                        <i className="material-icons">undo</i>
+                    </WButton>
+                </WCol>
+                <WCol size="1">
+                    <WButton  {...redoOptions}>
+                            <i className="material-icons">redo</i>
+                    </WButton>
+                </WCol>
+                <WCol style={{color:"white"}} > Region:</WCol>
                 <WCol size= "2">{" "+activeRegion.name}</WCol>
               </WRow>
             }
             </WLHeader>
-            <WCard wLayout="header-content-footer" style={{ width: "1025px", height: "550px", position: "fixed", left: "16%", top: "20%"}} raised className="example-layout-labels">
+            <WCard wLayout="header-content-footer" style={{ width: "1025px", height: "550px", position: "fixed", left: "16%", top: "20%", overflowY: "auto"}} raised className="example-layout-labels">
                 <WCHeader style={{ backgroundColor: "red", color: "white"}}>
                     <WRow style={{paddingTop:"20px"}}>
                         <WCol size="1" style={{textAlign:"center"}}></WCol>
