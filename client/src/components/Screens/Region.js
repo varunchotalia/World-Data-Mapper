@@ -10,7 +10,8 @@ import { WNavbar, WNavItem, WButton, WCard, WCContent, WCFooter, WCHeader, WInpu
 import { WLayout, WLHeader, WLMain, WLSide } from 'wt-frontend';
 import { useHistory, useParams } from "react-router-dom";
 import WMMain from 'wt-frontend/build/components/wmodal/WMMain';
-import { EditRegion_Transaction, UpdateRegions_Transaction } 				from '../../utils/jsTPS';
+import { EditRegion_Transaction, UpdateRegions_Transaction,
+    SortRegions_Transaction } 				from '../../utils/jsTPS';
 
 const Region = (props) => {
     const history = useHistory();
@@ -18,6 +19,7 @@ const Region = (props) => {
     let maps = [];
     let MapData = [];
     let { id } = useParams();
+    const [sortRule, setSortRule] = useState('unsorted'); // 1 is ascending, -1 desc
     const [activeRegionID, setActiveRegionID] 	= useState(id);
     const [index, setIndex] = useState(0);
     const [canUndo, setCanUndo] = useState(props.tps.hasTransactionToUndo());
@@ -64,7 +66,7 @@ const Region = (props) => {
     const client = useApolloClient();
 
 	const [Logout] = useMutation(LOGOUT);
-
+    const [sortRegions] 		= useMutation(mutations.SORT_REGIONS, mutationOptions);
     const [AddRegion] 			= useMutation(mutations.ADD_REGION, mutationOptions);
     const [DeleteRegion] 			= useMutation(mutations.DELETE_REGION, mutationOptions);
     const [UpdateRegion]        = useMutation(mutations.UPDATE_REGION_FIELD, mutationOptions);
@@ -140,6 +142,15 @@ const Region = (props) => {
 		tpsRedo();
     }
 
+    const sort = (criteria) => {
+		let prevSortRule = sortRule;
+		setSortRule(criteria);
+		let transaction = new SortRegions_Transaction(activeRegionID, criteria, prevSortRule, sortRegions);
+		console.log(transaction);
+		props.tps.addTransaction(transaction);
+		tpsRedo();
+	}
+
     const clickDisabled = () => { };
 
     const undoOptions = {
@@ -207,9 +218,9 @@ const Region = (props) => {
                 <WCHeader style={{ backgroundColor: "red", color: "white"}}>
                     <WRow style={{paddingTop:"20px"}}>
                         <WCol size="1" style={{textAlign:"center"}}></WCol>
-                        <WCol size="2" style={{textAlign:"center"}}>Name</WCol>
-                        <WCol size="2" style={{textAlign:"center"}}>Capital</WCol>
-                        <WCol size="2"style={{textAlign:"center"}}>Leader</WCol>
+                        <WCol size="2" onClick={() => sort("name")} style={{textAlign:"center", cursor:"pointer"}}>Name</WCol>
+                        <WCol size="2" onClick={() => sort("capital")} style={{textAlign:"center", cursor:"pointer"}}>Capital</WCol>
+                        <WCol size="2" onClick={() => sort("leader")} style={{textAlign:"center", cursor:"pointer"}}>Leader</WCol>
                         <WCol size="2"style={{textAlign:"center"}}>Flag</WCol>
                         <WCol size="3"style={{textAlign:"center"}}>Landmarks</WCol>
                     </WRow>

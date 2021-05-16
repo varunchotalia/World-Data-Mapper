@@ -1,6 +1,6 @@
 const ObjectId = require('mongoose').Types.ObjectId;
 const Map = require('../models/map-model');
-//const Sorting = require('../utils/sorting')
+const Sorting = require('../utils/sorting')
 
 module.exports = {
     Query: {
@@ -42,12 +42,14 @@ module.exports = {
         addMap: async (_, args) => {
             const { map } = args;
 			const objectId = new ObjectId();
-			const { id, name, owner, regions} = map;
+			const { id, name, owner, regions, sortRule, sortDirection} = map;
 			const newList = new Map({
 				_id: objectId,
 				name: name,
 				owner: owner,
 				regions: regions,
+				sortRule: sortRule,
+				sortDirection: sortDirection,
 			});
 			const updated = await newList.save();
 			if(updated) {
@@ -98,6 +100,32 @@ module.exports = {
 			else{
 				 return (found.regions);
 			}
-        }
+        },
+
+		sortRegions: async (_, args) => {
+			const { _id, criteria } = args;
+			const listId = new ObjectId(_id);
+			const found = await Map.findOne({_id: listId});
+			let newDirection = found.sortDirection === 1 ? -1 : 1; 
+			console.log(newDirection, found.sortDirection);
+			let sortedRegions;
+
+			switch(criteria) {
+				case 'name':
+					sortedRegions = Sorting.byName(found.regions, newDirection);
+					break;
+				case 'leader':
+					sortedRegions = Sorting.byLeader(found.regions, newDirection);
+					break;
+				case 'capital':
+					sortedRegions = Sorting.byCapital(found.regions, newDirection);
+					break;
+				default:
+					return found.regions;
+			}
+			const updated = await Map.updateOne({_id: listId}, { regions: sortedRegions, sortRule: criteria, sortDirection: newDirection })
+			if(updated) return (sortedRegions);
+
+		}
     }
 }

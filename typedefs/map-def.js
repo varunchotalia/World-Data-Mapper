@@ -6,6 +6,8 @@ const typeDefs = gql `
             name: String!
             owner: String!
             regions: [Region]
+            sortRule: String
+		    sortDirection: Int
         }
         type Region {
             _id: String!
@@ -24,6 +26,7 @@ const typeDefs = gql `
             deleteMap(_id: String!): Boolean
             updateMapField(_id: String!, field:String!, value:String!): String
             updateRegionField( _id: String!, regionId: String!, field: String!, value: String!): [Region]
+            sortRegions(_id: String!, criteria: String!): [Region]
         }
         input FieldInput {
             _id: String
@@ -35,6 +38,8 @@ const typeDefs = gql `
             name: String
             owner: String
             regions: [RegionInput]
+            sortRule: String
+		    sortDirection: Int
         }
         input RegionInput {
             _id: String

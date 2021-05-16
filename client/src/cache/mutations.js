@@ -32,7 +32,6 @@ mutation Update($_id: String!, $oldEmail: String!, $email: String!, $password: S
 }
 `;
 
-
 export const LOGOUT = gql`
 	mutation Logout {
 		logout 
@@ -82,6 +81,8 @@ export const ADD_MAP = gql`
 		    	capital
 			    landmarks 
 			}
+			sortRule
+			sortDirection
 		}
 	}
 `;
@@ -97,3 +98,16 @@ export const UPDATE_MAP_FIELD = gql`
 		updateMapField(_id: $_id, field: $field, value: $value)
 	}
 `;
+
+export const SORT_REGIONS = gql`
+	mutation SortRegions($_id: String!, $criteria: String!) {
+		sortRegions(_id: $_id, criteria: $criteria) {
+			_id
+			name
+			capital
+			leader
+			landmarks
+		}
+	}
+`;
+

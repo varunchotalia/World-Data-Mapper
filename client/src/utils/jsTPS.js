@@ -48,33 +48,30 @@ export class jsTPS_Transaction {
     
 // }
 
-// export class SortItems_Transaction extends jsTPS_Transaction{
-//     constructor(listID, nextSortRule, prevSortRule, callback) {
-//         super();
-//         this.listID = listID;
-//         this.nextSortRule = nextSortRule;
-//         this.prevSortRule = prevSortRule;
-//         this.updateFunction = callback;
-//     }
-//     async doTransaction() {
-// 		const { data } = await this.updateFunction({ variables: { _id: this.listID, criteria: this.nextSortRule}});
-//         if(data) {
-//             console.log(data)
-//             return data;
+export class SortRegions_Transaction extends jsTPS_Transaction{
+    constructor(parentID, nextSortRule, prevSortRule, callback) {
+        super();
+        this.parentID = parentID;
+        this.nextSortRule = nextSortRule;
+        this.prevSortRule = prevSortRule;
+        this.updateFunction = callback;
+    }
+    async doTransaction() {
+		const { data } = await this.updateFunction({ variables: { _id: this.parentID, criteria: this.nextSortRule}});
+        if(data) {
+            console.log(data)
+            return data;
+        }
+    }
 
-//         }
-//     }
-
-//     async undoTransaction() {
-// 		const { data } = await this.updateFunction({ variables: { _id: this.listID, criteria: this.prevSortRule}});
-//         if(data) {
-//             console.log(data)
-//             return data;
-
-//         }
-
-//     }
-// }
+     async undoTransaction() {
+		const { data } = await this.updateFunction({ variables: { _id: this.parentID, criteria: this.prevSortRule}});
+        if(data) {
+            console.log(data)
+            return data;
+        }
+    }
+}
 
 export class EditRegion_Transaction extends jsTPS_Transaction {
 	constructor(parentID, regionID, field, prev, update, callback) {

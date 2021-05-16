@@ -17,6 +17,14 @@ const mapSchema = new Schema(
                 required: true
         },
         regions: [Region],
+        sortRule: {
+			type: String, 
+			required: true
+		},
+		sortDirection: {
+			type: Number, 
+			required: true
+		}
     },
     { timestamps: true}
 );

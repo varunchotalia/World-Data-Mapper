@@ -82,7 +82,9 @@ const Maps = (props) => {
 			_id: Number.toString(mapID),
 			name: name,
 			owner: props.user._id,
-			regions: []
+			regions: [],
+            sortRule: 'name',
+			sortDirection: 1
 		}
         setMapID(mapID+1);
 		const { data } = await AddMap({ variables: { map: list }, refetchQueries: [{ query: GET_DB_MAPS }] });
