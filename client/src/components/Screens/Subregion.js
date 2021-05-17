@@ -153,6 +153,21 @@ import { EditRegion_Transaction, UpdateRegions_Transaction,
     SortRegions_Transaction } 				from '../../utils/jsTPS';
 
 const Subregion = (props) => {
+
+    const keyCombination = (e, callback) => {
+		if(e.key === 'z' && e.ctrlKey) {
+			if(props.tps.hasTransactionToUndo()) {
+				tpsUndo();
+			}
+		}
+		else if (e.key === 'y' && e.ctrlKey) { 
+			if(props.tps.hasTransactionToRedo()) {
+				tpsRedo();
+			}
+		}
+	}
+	document.onkeydown = keyCombination;
+
     const history = useHistory();
     const location = useLocation();
     const {activeMapId, activeRegion} = location.state;

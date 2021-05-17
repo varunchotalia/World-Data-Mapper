@@ -66,17 +66,17 @@ const App = () => {
 				/>
 				<Route/>
             </Switch>
-            {/* <Switch>
+            <Switch>
             <Route 
                     exact
-					path="/region/subregionview/:id"
-					name="subregion" 
+					path="/subregionview/:id"
+					name="subregionview" 
 					render={() => 
 						<RegionViewer tps={transactionStack} fetchUser={refetch} user={user} refreshTps={refreshTps}/>
 					} 
 				/>
 				<Route/>
-            </Switch> */}
+            </Switch>
 			<Switch>
 			<Route 
                     

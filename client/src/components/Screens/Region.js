@@ -14,6 +14,21 @@ import { EditRegion_Transaction, UpdateRegions_Transaction,
     SortRegions_Transaction } 				from '../../utils/jsTPS';
 
 const Region = (props) => {
+
+    const keyCombination = (e, callback) => {
+		if(e.key === 'z' && e.ctrlKey) {
+			if(props.tps.hasTransactionToUndo()) {
+				tpsUndo();
+			}
+		}
+		else if (e.key === 'y' && e.ctrlKey) { 
+			if(props.tps.hasTransactionToRedo()) {
+				tpsRedo();
+			}
+		}
+	}
+	document.onkeydown = keyCombination;
+
     const history = useHistory();
     const auth = props.user === null ? false : true;
     let maps = [];

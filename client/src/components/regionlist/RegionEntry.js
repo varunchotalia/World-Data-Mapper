@@ -18,12 +18,19 @@ const RegionEntry = (props) => {
     const [editingLeader, toggleLeaderEdit] = useState(false);
     const [editingName, toggleNameEdit] = useState(false);
 
-    const newTo ={
+    const nameTo ={
         pathname: `/subregion/${data._id}`,
         // param1: data,
         // param2: props.parentName
         state:{
             activeRegion: data, activeMapId: props.activeMap._id
+        }
+    };
+
+    const landmarkTo ={
+        pathname: `/subregionview/${data._id}`,
+        state:{
+            activeReg: data, activeMapId: props.activeMap._id
         }
     };
 
@@ -60,9 +67,14 @@ const RegionEntry = (props) => {
 
     const handleNameLinkClick = () => {
         props.tps.clearAllTransactions();
-        history.push(newTo);
+        history.push(nameTo);
        // window.location.reload();
         props.reloadList();
+    }
+
+    const handleLandmarkLinkClick = () => {
+        props.tps.clearAllTransactions();
+        history.push(landmarkTo);
     }
 
     // onClick={() => props.deleteRegion(data, props.index)}
@@ -128,7 +140,7 @@ const RegionEntry = (props) => {
             }
         </WCol>
         <WCol size="2" >Flag</WCol>
-        <WCol size="3" ><Link onClick={() => props.tps.clearAllTransactions()} to={newTo} >{landmarks[0]}, ...</Link></WCol>
+        <WCol size="3" ><div onClick={handleLandmarkLinkClick} style={{cursor:"pointer", color:"blue"}}>{landmarks[0]}, ...</div></WCol>
         {showDeleteRegion && <DeleteRegion deleteRegion={handleDeleteRegion} deleteRegionName={name} setShowDeleteRegion={toggleShowDeleteRegion} />}
     </WRow>
     );
