@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { WButton, WInput, WRow, WCol } from 'wt-frontend';
 import {BrowserRouter as Router, Link,} from "react-router-dom";
 import DeleteRegion 							from '../modals/DeleteRegion';
-
+import { useHistory } from "react-router-dom";
 
 const RegionEntry = (props) => {
     const { data } = props;
+    const history = useHistory();
 
     const name = data.name;
     const capital = data.capital;
@@ -18,11 +19,11 @@ const RegionEntry = (props) => {
     const [editingName, toggleNameEdit] = useState(false);
 
     const newTo ={
-        pathname: `subregionview/${data._id}`,
+        pathname: `/subregion/${data._id}`,
         // param1: data,
         // param2: props.parentName
         state:{
-            data: data, name: props.parentName
+            activeRegion: data, activeMapId: props.activeMap._id
         }
     };
 
@@ -53,8 +54,15 @@ const RegionEntry = (props) => {
         }
     }
 
-    const handleDeleteRegion = () =>{
+    const handleDeleteRegion = () => {
         props.handleDeleteRegion(data, props.index);
+    }
+
+    const handleNameLinkClick = () => {
+        props.tps.clearAllTransactions();
+        history.push(newTo);
+       // window.location.reload();
+        props.reloadList();
     }
 
     // onClick={() => props.deleteRegion(data, props.index)}
@@ -65,21 +73,30 @@ const RegionEntry = (props) => {
             </WCol>
         {
                 editingName || name === '' 
-                ?<WCol size="2">
+                ?<WCol size="1">
                      <WInput
                     className='table-input' onBlur={handleNameEdit}
                     onKeyDown={(e) => {if(e.keyCode === 13) handleNameEdit(e)}}
                     autoFocus={true} defaultValue={name} type='text'
                     inputClass="table-input-class"
                      />
-                    <i className="material-icons small" style={{color: "grey", pointerEvents: "none"}}>edit</i>
-                    <i className="material-icons small" onClick={() => toggleNameEdit(!editingName)}>edit</i>
+                    {/* <i className="material-icons small" style={{color: "grey", pointerEvents: "none"}}>edit</i> */}
+                    {/* <i className="material-icons small" onClick={() => toggleNameEdit(!editingName)}>edit</i> */}
                 </WCol>
                 : 
-                <WCol size="2">
-                     <Link to={`/subregion/${data._id}`}>{name}</Link>
-                     <i className="material-icons small" style={{cursor:"pointer", paddingLeft:"5px"}} onClick={() => toggleNameEdit(!editingName)}>edit</i>
+                <WCol size="1">
+                     <div onClick={handleNameLinkClick} style={{cursor:"pointer", color:"blue"}}>{name}</div>
+                     {/* <i className="material-icons small" style={{cursor:"pointer", paddingLeft:"5px"}} onClick={() => toggleNameEdit(!editingName)}>edit</i> */}
                 </WCol> 
+        }
+        {
+                editingName||name === ''
+                ?<WCol size="1">
+                    <i className="material-icons small" style={{color: "grey", pointerEvents: "none"}}>edit</i>
+                </WCol>
+                :<WCol size="1">
+                    <i className="material-icons small" style={{cursor:"pointer", paddingLeft:"5px"}} onClick={() => toggleNameEdit(!editingName)}>edit</i>
+                </WCol>
         }
         <WCol size="2" >
             {
@@ -111,7 +128,7 @@ const RegionEntry = (props) => {
             }
         </WCol>
         <WCol size="2" >Flag</WCol>
-        <WCol size="3" ><Link to={newTo} >{landmarks[0]}, ...</Link></WCol>
+        <WCol size="3" ><Link onClick={() => props.tps.clearAllTransactions()} to={newTo} >{landmarks[0]}, ...</Link></WCol>
         {showDeleteRegion && <DeleteRegion deleteRegion={handleDeleteRegion} deleteRegionName={name} setShowDeleteRegion={toggleShowDeleteRegion} />}
     </WRow>
     );
@@ -134,3 +151,6 @@ const newTo = {
 // In your Category Component, you can access the data like this
 this.props.match.params.catId // this is 595212758daa6810cbba4104 
 this.props.location.param1 // this is Par1 */}
+
+// `/subregion/${data._id}`
+//this.props.location.state

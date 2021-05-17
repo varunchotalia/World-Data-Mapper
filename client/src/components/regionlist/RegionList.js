@@ -4,10 +4,13 @@ import RegionEntry   from './RegionEntry';
 const RegionList = (props) => {
 
     let entries = props.activeList ? props.activeList.regions : null;
+    //let entries = props.regionList || props.regionList[0] !== {} ? props.regionList : null;
     let entryCount = 0;
+  //  console.log(entries[0]);
     if(entries) {
         entries = entries.filter(entry => entry !== null);
-        entryCount = entries.length
+        entries = entries.filter(entry => entry.parent === props.activeRegionID);
+        entryCount = entries.length;
     } 
     
     return (
@@ -16,8 +19,9 @@ const RegionList = (props) => {
                 entries.map((entry, index) => (
                     <RegionEntry
                         data={entry} key={entry._id} index={index} entryCount={entryCount}
-                        parentName={props.activeList.name} editRegion={props.editRegion}
+                        activeMap={props.activeList} editRegion={props.editRegion}
                         _id={entry._id} handleDeleteRegion={props.deleteRegion}
+                        tps={props.tps} reloadList={props.reloadList}
                         // deleteItem={props.deleteItem} reorderItem={props.reorderItem}
                         // editItem={props.editItem}
                     />

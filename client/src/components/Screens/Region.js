@@ -25,9 +25,12 @@ const Region = (props) => {
     const [canUndo, setCanUndo] = useState(props.tps.hasTransactionToUndo());
 	const [canRedo, setCanRedo] = useState(props.tps.hasTransactionToRedo());
     const [disabled, toggleDisabled] = useState(false);
+  //  const [regionList, setRegionList] = useState({});
+    //const [parent, setParent] = useState()
 
     const { loading, error, data, refetch } = useQuery(GET_DB_MAPS);
     let activeRegion = null;
+    let regionList = {};
 	if(loading) { console.log(loading, 'loading'); }
 	if(error) { console.log(error, 'error'); }
     if(data) { 
@@ -44,12 +47,18 @@ const Region = (props) => {
         // let tempID = activeRegionID;
 		// let list = maps.find(list => list._id === tempID);
 		activeRegion = maps.filter(map => map._id === activeRegionID )[0];
+        if(activeRegion){
+            regionList = activeRegion.regions.filter(region => region.parent === activeRegionID);
+            console.log("reach", regionList);   
+        }
+        // setRegionList(activeRegion.filter(region => region.parent === activeRegionID));
 	}
 
     const reloadList = async() =>{
         let tempID = activeRegionID;
 		let list = maps.find(list => list._id === tempID);
 		activeRegion = (list);
+        regionList = activeRegion.regions.filter(region => region.parent === activeRegionID);
     }
 
     const mutationOptions = {
@@ -77,6 +86,7 @@ const Region = (props) => {
         if (data) {
             let reset = await client.resetStore();
         }
+        props.tps.clearAllTransactions();
         history.push("/welcome");
     };
 
@@ -107,7 +117,9 @@ const Region = (props) => {
 			name: 'No Name',
 			capital: 'No capital',
 			leader: 'No One',
-			landmarks: ["No landmarks"]
+			landmarks: ["No landmarks"],
+            parent: activeRegionID
+            // children: []
 		};
         let opcode = 1;
 		let regionID = newRegion._id;
@@ -135,7 +147,8 @@ const Region = (props) => {
 			name: region.name,
 			capital: region.capital,
 			leader: region.leader,
-			landmarks: region.landmarks
+			landmarks: region.landmarks,
+            parent: region.parent
 		}
 		let transaction = new UpdateRegions_Transaction(activeRegionID, regionID, regionToDelete, opcode, AddRegion, DeleteRegion, index);
 		props.tps.addTransaction(transaction);
@@ -154,7 +167,8 @@ const Region = (props) => {
     const clickDisabled = () => { };
 
     const undoOptions = {
-        className: disabled || !canUndo ? ' table-header-button-disabled ' : 'table-header-button',
+        className:"material-icons",
+        id: disabled || !canUndo ? ' table-header-button-disabled ' : 'table-header-button',
         onClick: disabled || !canUndo  ? clickDisabled : tpsUndo,
         wType: "texted", 
         clickAnimation: disabled || !canUndo ? "" : "ripple-light",  
@@ -162,11 +176,17 @@ const Region = (props) => {
     }
 
     const redoOptions = {
-        className: disabled || !canRedo ? ' table-header-button-disabled ' : 'table-header-button ',
+        className:"material-icons",
+        id: disabled || !canRedo ? ' table-header-button-disabled ' : 'table-header-button ',
         onClick: disabled || !canRedo   ? clickDisabled : tpsRedo, 
         wType: "texted", 
         clickAnimation: disabled || !canRedo ? "" : "ripple-light" ,
         shape: "rounded"
+    }
+
+    const handleLogoClick = () =>{
+        props.tps.clearAllTransactions();
+        history.push("/maps");
     }
 
     let tempID = 0;
@@ -175,7 +195,7 @@ const Region = (props) => {
             <WLHeader>
                 <WNavbar className="welcome-navbar">
                     <ul>
-                        <WNavItem onClick={() => history.push("/maps")} style={{cursor:"pointer"}}>
+                        <WNavItem onClick={handleLogoClick} style={{cursor:"pointer"}}>
                             <Logo className='logo' />
                         </WNavItem>
                     </ul>
@@ -200,15 +220,10 @@ const Region = (props) => {
                         <i className="material-icons" onClick={addRegion} style={{color: "green", cursor:"pointer"}} >add</i>
                 </WCol>
                 <WCol size="1">
-                    <WButton {...undoOptions}>
-                        <i className="material-icons">undo</i>
-                    </WButton>
+                    <i  {...undoOptions} className="material-icons">undo</i>
+                    <i {...redoOptions} className="material-icons">redo</i>
                 </WCol>
-                <WCol size="1">
-                    <WButton  {...redoOptions}>
-                            <i className="material-icons">redo</i>
-                    </WButton>
-                </WCol>
+                <WCol size="1" style={{marginLeft:"0px"}}></WCol>
                 <WCol style={{color:"white"}} > Region:</WCol>
                 <WCol size= "2">{" "+activeRegion.name}</WCol>
               </WRow>
@@ -226,7 +241,8 @@ const Region = (props) => {
                     </WRow>
                 </WCHeader>
                 <WCContent style={{ backgroundColor: "grey", overflowY: "auto" }}>
-                  <RegionList activeList={activeRegion} editRegion={editRegion} deleteRegion={deleteRegion} />
+                  <RegionList activeList={activeRegion} editRegion={editRegion} deleteRegion={deleteRegion} regionList={regionList} 
+                  tps={props.tps} activeRegionID={activeRegionID} reloadList={reloadList} />
                 </WCContent>
                 <WCFooter style={{ backgroundColor: "grey" }}>
                
@@ -234,7 +250,7 @@ const Region = (props) => {
             </WCard>
 
             {
-				showUpdate && (<UpdateAccount fetchUser={props.fetchUser} user={props.user}setShowUpdate={setShowUpdate} />)
+				showUpdate && (<UpdateAccount fetchUser={props.fetchUser} user={props.user} setShowUpdate={setShowUpdate} tps={props.tps}/>)
 			}
 
         </WLayout>

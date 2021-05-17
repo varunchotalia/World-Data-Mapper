@@ -38,6 +38,7 @@ const UpdateAccount = (props) => {
 			toggleLoading(false);
 			props.fetchUser();
 			props.setShowUpdate(false);
+			props.tps.clearAllTransactions();
             history.push("/welcome");
 		};
 	};

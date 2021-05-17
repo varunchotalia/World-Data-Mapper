@@ -21,6 +21,10 @@ const regionSchema = new Schema(
         landmarks: {
             type: [String],
             required: true
+        },
+        parent: {
+            type: String,
+            required: true
         }
     }    
 );

@@ -51,7 +51,8 @@ export const DELETE_REGION = gql`
 			name
 			leader
 			capital
-			landmarks 
+			landmarks
+			parent
 		}
 	}
 `;
@@ -63,7 +64,8 @@ export const UPDATE_REGION_FIELD = gql`
 			name
 			leader
 			capital
-			landmarks 
+			landmarks
+			parent
 		}
 	}
 `;
@@ -80,6 +82,7 @@ export const ADD_MAP = gql`
 			    leader
 		    	capital
 			    landmarks 
+				parent
 			}
 			sortRule
 			sortDirection
@@ -107,6 +110,7 @@ export const SORT_REGIONS = gql`
 			capital
 			leader
 			landmarks
+			parent
 		}
 	}
 `;

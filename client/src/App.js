@@ -28,6 +28,9 @@ const App = () => {
 				<Route exact
 					path="/welcome"  
 					name="welcome" 
+					// component={(props) => 
+					// 	<Welcomescreen tps={transactionStack} fetchUser={refetch} user={user} refreshTps={refreshTps}/>
+					// } 
 					render={() => 
 						<Welcomescreen tps={transactionStack} fetchUser={refetch} user={user} refreshTps={refreshTps}/>
 					} 
@@ -40,6 +43,9 @@ const App = () => {
                     exact
 					path="/maps"
 					name="maps" 
+					// component={(props) => 
+					// 	<Maps tps={transactionStack} fetchUser={refetch} user={user} refreshTps={refreshTps}/>
+					// } 
 					render={() => 
 						<Maps tps={transactionStack} fetchUser={refetch} user={user} refreshTps={refreshTps}/>
 					} 
@@ -51,13 +57,16 @@ const App = () => {
                     exact
 					path="/region/:id"
 					name="region" 
+					// component={(props) => 
+					// 	<Region tps={transactionStack} fetchUser={refetch} user={user} refreshTps={refreshTps}/>
+					// } 
 					render={() => 
 						<Region tps={transactionStack} fetchUser={refetch} user={user} refreshTps={refreshTps}/>
 					} 
 				/>
 				<Route/>
             </Switch>
-            <Switch>
+            {/* <Switch>
             <Route 
                     exact
 					path="/region/subregionview/:id"
@@ -67,12 +76,15 @@ const App = () => {
 					} 
 				/>
 				<Route/>
-            </Switch>
+            </Switch> */}
 			<Switch>
 			<Route 
-                    exact
+                    
 					path="/subregion/:id"
-					name="subregion" 
+					name="subregion"
+					// component={(props) => 
+					// 	<Subregion tps={transactionStack} fetchUser={refetch} user={user} refreshTps={refreshTps}/>
+					// }  
 					render={() => 
 						<Subregion tps={transactionStack} fetchUser={refetch} user={user} refreshTps={refreshTps}/>
 					} 

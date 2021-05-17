@@ -22,6 +22,7 @@ export const GET_DB_MAPS = gql`
 			    leader
 		    	capital
 			    landmarks 
+				parent
 			}
 		}
 	}

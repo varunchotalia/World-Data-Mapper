@@ -24,7 +24,7 @@ module.exports = {
     },
     Mutation: {
         addRegion: async(_, args) => {
-            const { _id, region , index} = args;
+            const { _id, region, index} = args;
 			const listId = new ObjectId(_id);
 			const objectId = new ObjectId();
 			const found = await Map.findOne({_id: listId});

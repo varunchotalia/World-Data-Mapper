@@ -44,12 +44,17 @@ const RegionViewer = (props) =>{
 
     console.log("the value is "+ location.state.data);
 
+    const handleLogoClick = () =>{
+        props.tps.clearAllTransactions();
+        history.push("/maps");
+    }
+
     return (
         <WLayout wLayout="header-lside">
             <WLHeader>
                 <WNavbar className="welcome-navbar">
                     <ul>
-                        <WNavItem onClick={() => history.push("/maps")} style={{cursor:"pointer"}}>
+                        <WNavItem onClick={handleLogoClick} style={{cursor:"pointer"}}>
                             <Logo className='logo' />
                         </WNavItem>
                     </ul>

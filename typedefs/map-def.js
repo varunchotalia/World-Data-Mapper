@@ -15,6 +15,8 @@ const typeDefs = gql `
             capital: String!
             leader: String!
             landmarks: [String!]!
+            parent: String!
+            
         }
         extend type Query {
             getAllMaps: [Map]
@@ -47,6 +49,7 @@ const typeDefs = gql `
             capital: String
             leader: String
             landmarks: [String]
+            parent: String
         }
 `;
 
