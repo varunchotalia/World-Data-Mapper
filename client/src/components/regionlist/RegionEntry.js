@@ -13,6 +13,8 @@ const RegionEntry = (props) => {
     const leader = data.leader;
     const landmarks = data.landmarks;
 
+    console.log("landmarks", landmarks);
+
     const [showDeleteRegion, toggleShowDeleteRegion] 	= useState(false);
     const [editingCapital, toggleCapitalEdit] = useState(false);
     const [editingLeader, toggleLeaderEdit] = useState(false);
@@ -68,13 +70,14 @@ const RegionEntry = (props) => {
     const handleNameLinkClick = () => {
         props.tps.clearAllTransactions();
         history.push(nameTo);
-       // window.location.reload();
-        props.reloadList();
+       window.location.reload();
+        //props.reloadList();
     }
 
     const handleLandmarkLinkClick = () => {
         props.tps.clearAllTransactions();
         history.push(landmarkTo);
+        //props.reloadList();
     }
 
     // onClick={() => props.deleteRegion(data, props.index)}
@@ -140,7 +143,7 @@ const RegionEntry = (props) => {
             }
         </WCol>
         <WCol size="2" >Flag</WCol>
-        <WCol size="3" ><div onClick={handleLandmarkLinkClick} style={{cursor:"pointer", color:"blue"}}>{landmarks[0]}, ...</div></WCol>
+        <WCol size="3" ><div onClick={handleLandmarkLinkClick} style={{cursor:"pointer", color:"blue"}}>{landmarks.length===0?"No landmarks":landmarks[0]}, ...</div></WCol>
         {showDeleteRegion && <DeleteRegion deleteRegion={handleDeleteRegion} deleteRegionName={name} setShowDeleteRegion={toggleShowDeleteRegion} />}
     </WRow>
     );

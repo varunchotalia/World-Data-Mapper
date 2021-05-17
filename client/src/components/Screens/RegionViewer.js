@@ -143,7 +143,7 @@ const RegionViewer = (props) =>{
                 editRegion(activeRegionID, 'parent', activeMap._id, activeRegion.parent);
             else if(newParentName === activeRegion.name)
                 alert("A region's cannot be a parent of itself.")
-            else if(nameCheck.size !== 0)
+            else if(nameCheck.length !== 0)
                 editRegion(activeRegionID, 'parent', nameCheck[0]._id, activeRegion.parent);
             else    
                 alert("Parent not found.");
@@ -154,6 +154,7 @@ const RegionViewer = (props) =>{
         let transaction = new EditRegion_Transaction(activeMap._id, regionId, field, prev, value, UpdateRegion);
 		props.tps.addTransaction(transaction);
 		tpsRedo();
+      //  window.location.reload();
     }
 
     const [editingParentName, toggleParentNameEdit] = useState(false);
@@ -182,65 +183,70 @@ const RegionViewer = (props) =>{
                 </WNavbar>
             </WLHeader>
            
-             <WCard wLayout="header-content" style={{ width: "375px", height: "700px" }} raised className="example-layout-labels">
-                <WCHeader style={{ backgroundColor: "red", color: "white" }}>Region Information</WCHeader>
-                <WCContent style={{ backgroundColor: "grey" }}>
-                <WRow style={{paddingTop:"10px", color: "white"}}>
-                        <WCol size="7">
-                        Region Name:  {activeRegion?activeRegion.name:""}
-                        </WCol>
-                    </WRow>
-                    <WRow style={{paddingTop:"20px", color: "white"}}>
-                        <WCol size="4">
-                        Parent Region: 
-                        </WCol>
-                    {    editingParentName || parentName === ''
-                        ?<WCol size="4">
-                                <WInput className='table-input' onBlur={handleParentNameEdit}
-                                onKeyDown={(e) => {if(e.keyCode === 13) handleParentNameEdit(e)}}
-                                autoFocus={true} defaultValue={parentName?parentName:"Loading Name..."}
-                                type='text' inputClass="table-input-class"/>
-                          </WCol>  
-                        :<WCol size="4" >
-                            <div className="table-text" onClick={handleParentNameClick} style={parentName?{color: "blue", cursor: "pointer"}:{color: "white", pointerEvents: "none"}}>{parentName?parentName:"Loading Name..."}</div>
-                            </WCol>   
+             {/* <WCard wLayout="header-content" style={{ width: "375px", height: "700px" }} raised className="example-layout-labels"> */}
+             <WLSide side="left">
+                 <WSidebar style={{paddingTop:"50px"}}>
+                    {/* <WCHeader style={{ backgroundColor: "red", color: "white" }}>Region Information</WCHeader> */}
+                    {/* <WCContent style={{ backgroundColor: "grey" }}> */}
+                    <WRow style={{paddingTop:"10px", color: "white"}}>
+                            <WCol size="7">
+                            Region Name:  {activeRegion?activeRegion.name:""}
+                            </WCol>
+                        </WRow>
+                        <WRow style={{paddingTop:"20px", color: "white"}}>
+                            <WCol size="4">
+                            Parent Region: 
+                            </WCol>
+                        {    editingParentName || parentName === ''
+                            ?<WCol size="4">
+                                    <WInput className='table-input' onBlur={handleParentNameEdit}
+                                    onKeyDown={(e) => {if(e.keyCode === 13) handleParentNameEdit(e)}}
+                                    autoFocus={true} defaultValue={parentName?parentName:"Loading Name..."}
+                                    type='text' inputClass="table-input-class"/>
+                            </WCol>  
+                            :<WCol size="4" >
+                                <div className="table-text" onClick={handleParentNameClick} style={parentName?{color: "blue", cursor: "pointer"}:{color: "white", pointerEvents: "none"}}>{parentName?parentName:"Loading Name..."}</div>
+                                </WCol>   
+                            }
+                        {
+                            editingParentName || parentName === ''
+                            ?<WCol size="1">
+                                <i className="material-icons small" style={{color: "grey", pointerEvents: "none"}}>edit</i>
+                            </WCol>
+                            :<WCol size="1">
+                                <i className="material-icons small" style={{cursor:"pointer", paddingLeft:"5px"}} onClick={() => toggleParentNameEdit(!editingParentName)}>edit</i>
+                            </WCol>
                         }
-                    {
-                        editingParentName || parentName === ''
-                        ?<WCol size="1">
-                            <i className="material-icons small" style={{color: "grey", pointerEvents: "none"}}>edit</i>
-                        </WCol>
-                        :<WCol size="1">
-                             <i className="material-icons small" style={{cursor:"pointer", paddingLeft:"5px"}} onClick={() => toggleParentNameEdit(!editingParentName)}>edit</i>
-                        </WCol>
-                    }
-                            
-                    </WRow>
-                    <WRow style={{paddingTop:"20px", color: "white"}}>
-                        <WCol size="7">
-                        Region Capital: {activeRegion?activeRegion.capital:""}
-                        </WCol>
-                    </WRow>
-                    <WRow style={{paddingTop:"20px", color: "white"}}>
-                        <WCol size="7">
-                        Region Leader: {activeRegion?activeRegion.leader:""}
-                        </WCol>
-                    </WRow>
-                    <WRow style={{paddingTop:"20px", color: "white"}}>
-                        <WCol size="7">
-                        Number of Sub-regions: 0
-                        </WCol>
-                    </WRow>
-                </WCContent>
-            </WCard>
+                                
+                        </WRow>
+                        <WRow style={{paddingTop:"20px", color: "white"}}>
+                            <WCol size="7">
+                            Region Capital: {activeRegion?activeRegion.capital:""}
+                            </WCol>
+                        </WRow>
+                        <WRow style={{paddingTop:"20px", color: "white"}}>
+                            <WCol size="7">
+                            Region Leader: {activeRegion?activeRegion.leader:""}
+                            </WCol>
+                        </WRow>
+                        <WRow style={{paddingTop:"20px", color: "white"}}>
+                            <WCol size="7">
+                            Number of Sub-regions: 0
+                            </WCol>
+                        </WRow>
+                    {/* </WCContent> */}
+                    </WSidebar>
+            </WLSide>
+            {/* </WCard> */}
+            <WLMain>
             <WRow >
                 <WCol size="1" style={{paddingTop:"20px", color: "white", paddingTop: "10px", paddingLeft: "350px"}}>  Region Landmarks:</WCol>
             </WRow>
-            <WCard wLayout="content-footer" style={{ width: "375px", height: "400px" }} raised className="example-layout-labels">
-                <WCContent style={{ backgroundColor: "lightskyblue" }}>Content<label>w x h</label></WCContent>
-                <WCFooter style={{ backgroundColor: "aquamarine" }}>Footer<label>w x h</label></WCFooter>
+            <WCard wLayout="content-footer" style={{ width: "375px", height: "400px", marginLeft:"350px", overflow: "auto"}} raised className="example-layout-labels">
+                <WCContent style={{ backgroundColor: "black" }}>Content<label>w x h</label></WCContent>
+                <WCFooter style={{ backgroundColor: "lightgray" }}>Footer<label>w x h</label></WCFooter>
             </WCard>
-            
+            </WLMain>
             {
 				showUpdate && (<UpdateAccount fetchUser={props.fetchUser} user={props.user} setShowUpdate={setShowUpdate} />)
 			}

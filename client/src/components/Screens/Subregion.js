@@ -178,7 +178,7 @@ const Subregion = (props) => {
     const [sortRule, setSortRule] = useState('unsorted'); // 1 is ascending, -1 desc
     const [activeRegionID, setActiveRegionID] 	= useState(id);
     
-    const mounted = useRef();
+    //const mounted = useRef();
     // useEffect(() => {
     //   if (!mounted.current) {
     //     // do componentDidMount logic
@@ -287,7 +287,7 @@ const Subregion = (props) => {
 			name: 'No Name',
 			capital: 'No capital',
 			leader: 'No One',
-			landmarks: ["No landmarks"],
+			landmarks: [],
             parent: activeRegionID
             // children: []
 		};
@@ -367,12 +367,13 @@ const Subregion = (props) => {
         console.log("handleregionclick", activeMap.regions.find(region => region === activeRegion.parent));
         if(temp){
             history.push(`/region/${activeRegion.parent}`);
+            // window.location.reload();
         }
         else{
             history.push({pathname: `/subregion/${activeRegion.parent}`, state: {
                 activeRegion: activeMap.regions.find(region => region._id === activeRegion.parent), activeMapId: activeMapId
             }});
-            // window.location.reload();
+            window.location.reload();
         }
     }
 

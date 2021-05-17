@@ -132,7 +132,7 @@ const Region = (props) => {
 			name: 'No Name',
 			capital: 'No capital',
 			leader: 'No One',
-			landmarks: ["No landmarks"],
+			landmarks: [],
             parent: activeRegionID
             // children: []
 		};
