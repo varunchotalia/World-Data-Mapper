@@ -83,6 +83,19 @@ export const ADD_LANDMARK = gql`
 	}
 `;
 
+export const DELETE_LANDMARK = gql`
+mutation DeleteLandmark($_id: String!, $regionId: String!, $name: String!) {
+	deleteLandmark(_id: $_id, regionId: $regionId, name: $name) {
+		_id
+		name
+		leader
+		capital
+		landmarks
+		parent
+	}
+}
+`;
+
 export const ADD_MAP = gql`
 	mutation AddMap($map: MapInput!) {
 		addMap(map: $map) {

@@ -144,8 +144,74 @@ export class UpdateRegions_Transaction extends jsTPS_Transaction {
     }
 }
 
+export class UpdateLandmarks_Transaction extends jsTPS_Transaction {
+    // opcodes: 0 - delete, 1 - add 
+    //activeRegionID, activeMap._id, opcode, name, AddLandmark, DeleteLandmark
+    constructor(regionID, parentID, opcode, name, addfunc, delfunc) {
+        super();
+        this.parentID = parentID;
+		this.regionID = regionID;
+		this.name = name;
+        this.addFunction = addfunc;
+        this.deleteFunction = delfunc;
+        this.opcode = opcode;
+    }
+    //await DeleteLandmark({variables: {_id: activeMap._id, regionId: activeRegionID, name: name}})
+    // //  await AddLandmark({variables: {_id: activeMap._id, regionId: activeRegionID, value: [name, activeRegionID]}})
+    async doTransaction() {
+		let data;
+        this.opcode === 0 ? { data } = await this.deleteFunction({
+							variables: {regionId: this.regionID, _id: this.parentID, name: this.name}})
+						  : { data } = await this.addFunction({
+							variables: {regionId: this.regionID, _id: this.parentID, value: [this.name, this.regionID]}})  
+		if(this.opcode !== 0) {
+           // this.region._id = this.regionID = data.addRegion;
+		}
+		return data;
+    }
+    // Since delete/add are opposites, flip matching opcode
+    async undoTransaction() {
+        let data;
+        this.opcode === 1 ? { data } = await this.deleteFunction({
+							variables: {regionId: this.regionID, _id: this.parentID, name: this.name}})
+						  : { data } = await this.addFunction({
+							variables: {regionId: this.regionID, _id: this.parentID, value: [this.name, this.regionID]}})  
+		if(this.opcode !== 1) {
+           // this.region._id = this.regionID = data.addRegion;
+		}
+		return data;
+    }
+}
 
-
+// let transaction = new UpdateLandmarkName_Transaction(activeRegionID, activeMap._id, prevname, newname, AddLandmark, DeleteLandmark);
+export class UpdateLandmarkName_Transaction extends jsTPS_Transaction {
+    // opcodes: 0 - delete, 1 - add 
+    //activeRegionID, activeMap._id, opcode, name, AddLandmark, DeleteLandmark
+    constructor(regionID, parentID, prevname, newname, addfunc, delfunc) {
+        super();
+        this.parentID = parentID;
+		this.regionID = regionID;
+		this.prevname = prevname;
+        this.newname = newname;
+        this.addFunction = addfunc;
+        this.deleteFunction = delfunc;
+    }
+    //await DeleteLandmark({variables: {_id: activeMap._id, regionId: activeRegionID, name: name}})
+    // //  await AddLandmark({variables: {_id: activeMap._id, regionId: activeRegionID, value: [name, activeRegionID]}})
+    async doTransaction() {
+		// let data;
+        // let data1
+        const { data } = await this.deleteFunction({variables: {regionId: this.regionID, _id: this.parentID, name: this.prevname}})
+        const { data1 } = await this.addFunction({variables: {regionId: this.regionID, _id: this.parentID, value: [this.newname, this.regionID]}})  
+		return data;
+    }
+    // Since delete/add are opposites, flip matching opcode
+    async undoTransaction() {
+        const { data } = await this.deleteFunction({variables: {regionId: this.regionID, _id: this.parentID, name: this.newname}})
+        const { data1 } = await this.addFunction({variables: {regionId: this.regionID, _id: this.parentID, value: [this.prevname, this.regionID]}})  
+		return data;
+    }
+}
 
 export class jsTPS {
     constructor() {

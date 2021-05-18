@@ -108,24 +108,12 @@ module.exports = {
 			const listId = new ObjectId(_id);
 			const found = await Map.findOne({_id: listId});
 			let listRegions = found.regions;
-			// var counts = {};
-			// for (var i = 0; i < listRegions.length; i++) {
-    		// 	counts[listRegions[i].parent] = 1 + (counts[listRegions[i].parent] || 0);
-			// }
-			// for(let i = 0; i < counts.length)
 			let tempRegion = listRegions.filter(region => region._id.toString() === regionId)[0];
 			let tempList = [];
-			console.log("listRegions", listRegions);
-			console.log("region", regionId);
-			console.log("tempRegion", tempRegion);
-			console.log("value", value);
 			let newValue = [value[0][0], value[1][0]];
-			console.log("newVal",newValue);
 			tempList.push(Parents.findAncestors(listRegions, _id, tempRegion, tempList));
 			let list = tempList;
-			console.log("iflist", list);
 			if(list!={}){
-				console.log("list", list);
 				for(let i=0; i<list.length;i++){
 					listRegions.map(region => {
 						let temp = JSON.parse(JSON.stringify(region.landmarks));
@@ -139,7 +127,6 @@ module.exports = {
 			listRegions.map(region => {
 				let temp = JSON.parse(JSON.stringify(region.landmarks));
 				temp.push(newValue);
-				console.log("temp", temp);
 				if(region._id.toString() === regionId) {	
 					region.landmarks = temp;
 				}
@@ -152,7 +139,33 @@ module.exports = {
 				 return (found.regions);
 			} 
 		},
-
+		deleteLandmark: async(_, args) =>{
+			const {_id, regionId, name} = args;
+			const listId = new ObjectId(_id);
+			const found = await Map.findOne({_id: listId});
+			let listRegions = found.regions;
+			listRegions.map(region => {
+				let temp = JSON.parse(JSON.stringify(region.landmarks));
+				console.log("temp",temp[0][1]);
+			//	temp.filter((a, b) => landmark[0] !== name);
+				for(let i=0; i<temp.length;i++){
+					if(temp[i][0] == name){
+						temp.splice(i, 1);
+					}
+				}
+				console.log("posttemp",temp);
+				if(region._id.toString() === regionId) {	
+					region.landmarks = temp;
+				}
+			});
+			const updated = await Map.updateOne({_id: listId}, { regions: listRegions });
+			if(updated){
+			 return (listRegions);
+			}
+			else{
+				 return (found.regions);
+			} 
+		},
 		sortRegions: async (_, args) => {
 			const { _id, criteria } = args;
 			const listId = new ObjectId(_id);

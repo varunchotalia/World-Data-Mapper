@@ -11,24 +11,24 @@ import { WLayout, WLHeader, WLMain, WLSide } from 'wt-frontend';
 import { useHistory, useParams, useLocation } from "react-router-dom";
 import WMMain from 'wt-frontend/build/components/wmodal/WMMain';
 import WSidebar from 'wt-frontend/build/components/wsidebar/WSidebar';
-import { EditRegion_Transaction} 				from '../../utils/jsTPS';
+import { EditRegion_Transaction, UpdateLandmarks_Transaction, UpdateLandmarkName_Transaction} 				from '../../utils/jsTPS';
 //import LandmarkEntry from '../landmarklist/LandmarkEntry';
 
 const RegionViewer = (props) =>{
 
-    // const keyCombination = (e, callback) => {
-	// 	if(e.key === 'z' && e.ctrlKey) {
-	// 		if(props.tps.hasTransactionToUndo()) {
-	// 			tpsUndo();
-	// 		}
-	// 	}
-	// 	else if (e.key === 'y' && e.ctrlKey) { 
-	// 		if(props.tps.hasTransactionToRedo()) {
-	// 			tpsRedo();
-	// 		}
-	// 	}
-	// }
-	// document.onkeydown = keyCombination;
+    const keyCombination = (e, callback) => {
+		if(e.key === 'z' && e.ctrlKey) {
+			if(props.tps.hasTransactionToUndo()) {
+				tpsUndo();
+			}
+		}
+		else if (e.key === 'y' && e.ctrlKey) { 
+			if(props.tps.hasTransactionToRedo()) {
+				tpsRedo();
+			}
+		}
+	}
+	document.onkeydown = keyCombination;
 
     const history = useHistory();
     const location = useLocation()
@@ -39,6 +39,7 @@ const RegionViewer = (props) =>{
   //  const [parentID, setParentID] = useState(activeRegion.parent);
     const [canUndo, setCanUndo] = useState(props.tps.hasTransactionToUndo());
 	const [canRedo, setCanRedo] = useState(props.tps.hasTransactionToRedo());
+    const [disabled, toggleDisabled] = useState(false);
 
     const { loading, error, data, refetch } = useQuery(GET_DB_MAPS);
     let maps = [];
@@ -61,7 +62,7 @@ const RegionViewer = (props) =>{
 		//activeMap = maps.filter(map => map._id === tempID )[0];
         if(activeMap){
             activeRegion = activeMap.regions.filter(region => region._id === activeRegionID)[0];
-            regionList = activeMap.regions.filter(region => region.parent === activeRegionID);
+            regionList = activeMap.regions.filter(region => region.parent === activeRegion.parent);
             if(activeRegion.parent === activeMap._id){
                 parentName = activeMap.name;
             }
@@ -162,6 +163,7 @@ const RegionViewer = (props) =>{
     const [landmarkName, setLandmarkName] = useState("");
     const [UpdateMapField] 	= useMutation(mutations.UPDATE_MAP_FIELD, mutationOptions);
     const [AddLandmark] 	= useMutation(mutations.ADD_LANDMARK, mutationOptions);
+    const [DeleteLandmark] 	= useMutation(mutations.DELETE_LANDMARK, mutationOptions);
 
     // const handleAddLandmark = async (name) =>{
     //     if(name==="")
@@ -192,14 +194,90 @@ const RegionViewer = (props) =>{
             if(name === "")
                 return;
             if(activeMap){
-                const { data } = await AddLandmark({variables: {_id: activeMap._id, regionId: activeRegionID, value: [name, activeRegionID]}})
+                let opcode = 1;
+              //  const { data } = await AddLandmark({variables: {_id: activeMap._id, regionId: activeRegionID, value: [name, activeRegionID]}})
+                let transaction = new UpdateLandmarks_Transaction(activeRegionID, activeMap._id, opcode, name, AddLandmark, DeleteLandmark);
+		        props.tps.addTransaction(transaction);
+		        tpsRedo();
             }
         }
 
-        const handleDeleteLandmark = async() =>{
-
+        const handleDeleteLandmark = async(name) =>{
+            if(activeMap){
+                let opcode = 0;
+               // const { data } = await DeleteLandmark({variables: {_id: activeMap._id, regionId: activeRegionID, name: name}})
+                let transaction = new UpdateLandmarks_Transaction(activeRegionID, activeMap._id, opcode, name, AddLandmark, DeleteLandmark);
+		        props.tps.addTransaction(transaction);
+		        tpsRedo();
+            }
         }
 
+        const handleUpdateLandmark = async(prevname, newname) =>{
+            if(activeMap){
+                const { data } = await DeleteLandmark({variables: {_id: activeMap._id, regionId: activeRegionID, name: prevname}})
+                const { data1 } = await AddLandmark({variables: {_id: activeMap._id, regionId: activeRegionID, value: [newname, activeRegionID]}})
+                // let transaction = new UpdateLandmarkName_Transaction(activeRegionID, activeMap._id, prevname, newname, AddLandmark, DeleteLandmark);
+		        // props.tps.addTransaction(transaction);
+		        // tpsRedo();
+            }
+        }
+
+        const clickDisabled = () => { };
+
+        const undoOptions = {
+            className:"material-icons",
+            id: disabled || !canUndo ? ' table-header-button-disabled ' : 'table-header-button',
+            onClick: disabled || !canUndo  ? clickDisabled : tpsUndo,
+            wType: "texted", 
+            clickAnimation: disabled || !canUndo ? "" : "ripple-light",  
+            shape: "rounded"
+        }
+    
+        const redoOptions = {
+            className:"material-icons",
+            id: disabled || !canRedo ? ' table-header-button-disabled ' : 'table-header-button ',
+            onClick: disabled || !canRedo   ? clickDisabled : tpsRedo, 
+            wType: "texted", 
+            clickAnimation: disabled || !canRedo ? "" : "ripple-light" ,
+            shape: "rounded"
+        }
+
+        const handleprevioussibling = () =>{
+            if(regionList){
+            let index = 0;
+            console.log("list",regionList)
+;            for(let i=0; i<regionList.length;i++){
+                if(regionList[i]._id===activeRegionID){
+                    console.log("reach");
+                    index = i;
+                }
+            }
+            console.log("index", index);
+            props.tps.clearAllTransactions();
+            if(index !==0){
+                history.push({pathname: `/subregionview/${regionList[index-1]._id}`, 
+                state: {activeRegion: activeMap.regions.find(region => region._id === activeRegion.parent), activeMapId: activeMapId}});
+                window.location.reload();
+            }   
+        }
+        }
+
+        const handlenextsibling = () =>{
+            if(regionList){
+            let index = 0;
+            for(let i=0; i<regionList.length;i++){
+                if(regionList[i]._id===activeRegionID)
+                    index = i;
+            }
+            props.tps.clearAllTransactions();
+            if((index+1) !==regionList.length){
+                history.push({pathname: `/subregionview/${regionList[index+1]._id}`, 
+                state: {activeRegion: activeMap.regions.find(region => region._id === activeRegion.parent), activeMapId: activeMapId}});
+                window.location.reload();
+            }   
+        }
+        }
+        
 
     return (
         <WLayout wLayout="header-lside">
@@ -208,6 +286,12 @@ const RegionViewer = (props) =>{
                     <ul>
                         <WNavItem onClick={handleLogoClick} style={{cursor:"pointer"}}>
                             <Logo className='logo' />
+                        </WNavItem>
+                        <WNavItem onClick={handleprevioussibling} style={{cursor:"pointer"}}>
+                        <i className="material-icons">arrow_left</i>
+                        </WNavItem>
+                        <WNavItem onClick={handlenextsibling} style={{cursor:"pointer"}}>
+                        <i className="material-icons">arrow_right</i>
                         </WNavItem>
                     </ul>
                     <ul>
@@ -230,7 +314,16 @@ const RegionViewer = (props) =>{
                  <WSidebar style={{paddingTop:"50px"}}>
                     {/* <WCHeader style={{ backgroundColor: "red", color: "white" }}>Region Information</WCHeader> */}
                     {/* <WCContent style={{ backgroundColor: "grey" }}> */}
+                    <WRow style={{paddingTop:"10px"}}>
+                    <WCol size="1">
+                    <i  {...undoOptions} className="material-icons">undo</i>
+                </WCol>
+                    <WCol size="1">
+                    <i {...redoOptions} className="material-icons">redo</i>
+                    </WCol>
+                    </WRow>
                     <WRow style={{paddingTop:"10px", color: "white"}}>
+                        
                             <WCol size="7">
                             Region Name:  {activeRegion?activeRegion.name:""}
                             </WCol>
@@ -286,7 +379,8 @@ const RegionViewer = (props) =>{
             </WRow>
             <WCard wLayout="content-footer" style={{ width: "375px", height: "400px", marginLeft:"350px"}} raised className="example-layout-labels">
                 <WCContent style={{ backgroundColor: "black", color: "white", overflow:"auto" }}>
-                    <LandmarkList landmarks={activeRegion?activeRegion.landmarks:null} handleDeleteLandmark={handleDeleteLandmark}/>
+                    <LandmarkList landmarks={activeRegion?activeRegion.landmarks:null} handleDeleteLandmark={handleDeleteLandmark}
+                    activeRegionID={activeRegionID} activeMap={activeMap?activeMap:null} handleUpdateLandmark={handleUpdateLandmark} />
                 </WCContent>
                 <WCFooter style={{ backgroundColor: "lightgray" }}>
                     <WRow>

@@ -12,6 +12,8 @@ const LandmarkList = (props) => {
                     <LandmarkEntry
                         id={tempID++} key={tempID} data={entry} 
                         handleDeleteLandmark={props.handleDeleteLandmark}
+                        handleUpdateLandmark={props.handleUpdateLandmark}
+                        activeRegionID={props.activeRegionID} activeMap={props.activeMap}
                     />
                 ))
             }
