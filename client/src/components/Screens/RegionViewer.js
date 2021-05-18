@@ -2,7 +2,7 @@ import Logo 							from '../navbar/Logo';
 import UpdateAccount 							from '../modals/UpdateAccount';
 import * as mutations 					from '../../cache/mutations';
 import { GET_DB_MAPS } 				from '../../cache/queries';
-import RegionList                      from '../regionlist/RegionList';
+import LandmarkList                      from '../landmarklist/LandmarkList';
 import React, { useState } 				from 'react';
 import { LOGOUT }                           from '../../cache/mutations';
 import { useMutation, useQuery, useApolloClient } 		from '@apollo/client';
@@ -12,6 +12,7 @@ import { useHistory, useParams, useLocation } from "react-router-dom";
 import WMMain from 'wt-frontend/build/components/wmodal/WMMain';
 import WSidebar from 'wt-frontend/build/components/wsidebar/WSidebar';
 import { EditRegion_Transaction} 				from '../../utils/jsTPS';
+//import LandmarkEntry from '../landmarklist/LandmarkEntry';
 
 const RegionViewer = (props) =>{
 
@@ -67,7 +68,7 @@ const RegionViewer = (props) =>{
             else {
                 parentName = activeMap.regions.filter(region => region._id === activeRegion.parent)[0].name;
             }
-            
+            console.log("activeRegion", activeRegion);
             // if(regionCheck.parent !== activeRegion.parent)
             //     activeRegion = regionCheck;
         }
@@ -77,7 +78,7 @@ const RegionViewer = (props) =>{
 		refetchQueries: [{ query: GET_DB_MAPS }], 
 		awaitRefetchQueries: true,
 		//onCompleted: () => reloadList()
-	}
+	};
 
     const tpsUndo = async () => {
 		const ret = await props.tps.undoTransaction();
@@ -85,7 +86,7 @@ const RegionViewer = (props) =>{
 			setCanUndo(props.tps.hasTransactionToUndo());
 			setCanRedo(props.tps.hasTransactionToRedo());
 		}
-	}
+	};
 
 	const tpsRedo = async () => {
 		const ret = await props.tps.doTransaction();
@@ -93,7 +94,7 @@ const RegionViewer = (props) =>{
 			setCanUndo(props.tps.hasTransactionToUndo());
 			setCanRedo(props.tps.hasTransactionToRedo());
 		}
-	}
+	};
 
     const [showUpdate, toggleShowUpdate] 	= useState(false);
 
@@ -120,7 +121,7 @@ const RegionViewer = (props) =>{
     const handleLogoClick = () => {
         props.tps.clearAllTransactions();
         history.push("/maps");
-    }
+    };
 
     const handleParentNameClick = () => {
         props.tps.clearAllTransactions();
@@ -131,7 +132,7 @@ const RegionViewer = (props) =>{
             history.push({pathname: `/subregion/${activeRegion.parent}`, 
             state: {activeRegion: activeMap.regions.find(region => region._id === activeRegion.parent), activeMapId: activeMapId}});
         }
-    }
+    };
 
     const handleParentNameEdit = (e) => {
         toggleParentNameEdit(false);
@@ -148,16 +149,57 @@ const RegionViewer = (props) =>{
             else    
                 alert("Parent not found.");
         }
-    }
+    };
 
     const editRegion = (regionId, field, value, prev) => {
         let transaction = new EditRegion_Transaction(activeMap._id, regionId, field, prev, value, UpdateRegion);
 		props.tps.addTransaction(transaction);
 		tpsRedo();
       //  window.location.reload();
-    }
+    };
 
     const [editingParentName, toggleParentNameEdit] = useState(false);
+    const [landmarkName, setLandmarkName] = useState("");
+    const [UpdateMapField] 	= useMutation(mutations.UPDATE_MAP_FIELD, mutationOptions);
+    const [AddLandmark] 	= useMutation(mutations.ADD_LANDMARK, mutationOptions);
+
+    // const handleAddLandmark = async (name) =>{
+    //     if(name==="")
+    //         return;
+    //     if(activeMap){
+    //     let mapCopy = JSON.parse(JSON.stringify(activeMap));
+    //     let activeRegionCopy = mapCopy.regions.filter(region => region._id === activeRegionID)[0]; 
+    //     activeRegionCopy.landmarks.push([name, activeRegionID]);
+    //     recursiveAddLandmark(name, activeRegionCopy.parent, mapCopy);
+    //     console.log("regions", mapCopy.regions);
+    //     const { data } = await UpdateMapField({ variables: { _id: activeMap._id, field: "regions", value: []}});
+    //   //  return data;
+    //     }
+    // };
+
+    // function recursiveAddLandmark(name, parentId, mapCopy){
+    //     if(parentId !== activeMap._id){
+    //         let region = mapCopy.regions.filter(region => region._id === parentId)[0];
+    //         region.landmarks.push([name, activeRegionID]);
+    //         recursiveAddLandmark(name, region.parent);
+    //     }
+    //     else{
+    //         return;
+    //     }
+    // }
+
+        const handleAddLandmark = async(name) => {
+            if(name === "")
+                return;
+            if(activeMap){
+                const { data } = await AddLandmark({variables: {_id: activeMap._id, regionId: activeRegionID, value: [name, activeRegionID]}})
+            }
+        }
+
+        const handleDeleteLandmark = async() =>{
+
+        }
+
 
     return (
         <WLayout wLayout="header-lside">
@@ -242,9 +284,23 @@ const RegionViewer = (props) =>{
             <WRow >
                 <WCol size="1" style={{paddingTop:"20px", color: "white", paddingTop: "10px", paddingLeft: "350px"}}>  Region Landmarks:</WCol>
             </WRow>
-            <WCard wLayout="content-footer" style={{ width: "375px", height: "400px", marginLeft:"350px", overflow: "auto"}} raised className="example-layout-labels">
-                <WCContent style={{ backgroundColor: "black" }}>Content<label>w x h</label></WCContent>
-                <WCFooter style={{ backgroundColor: "lightgray" }}>Footer<label>w x h</label></WCFooter>
+            <WCard wLayout="content-footer" style={{ width: "375px", height: "400px", marginLeft:"350px"}} raised className="example-layout-labels">
+                <WCContent style={{ backgroundColor: "black", color: "white", overflow:"auto" }}>
+                    <LandmarkList landmarks={activeRegion?activeRegion.landmarks:null} handleDeleteLandmark={handleDeleteLandmark}/>
+                </WCContent>
+                <WCFooter style={{ backgroundColor: "lightgray" }}>
+                    <WRow>
+                    <WCol size="2">
+                        <i className="material-icons" onClick={() => handleAddLandmark(landmarkName)} style={{color: "green", cursor:"pointer"}}>add</i>
+                    </WCol>
+                    <WCol size="5">
+                    <WInput className='table-input' onBlur={(e) => setLandmarkName(e.target.value)}
+                                    onKeyDown={(e) => {if(e.keyCode === 13) handleAddLandmark(e.target.value)}}
+                                    autoFocus={true} 
+                                    type='text' inputClass="table-input-class"/>
+                    </WCol>
+                    </WRow>
+                </WCFooter>
             </WCard>
             </WLMain>
             {

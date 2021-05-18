@@ -70,7 +70,7 @@ const RegionEntry = (props) => {
     const handleNameLinkClick = () => {
         props.tps.clearAllTransactions();
         history.push(nameTo);
-       window.location.reload();
+        window.location.reload();
         //props.reloadList();
     }
 
@@ -143,7 +143,7 @@ const RegionEntry = (props) => {
             }
         </WCol>
         <WCol size="2" >Flag</WCol>
-        <WCol size="3" ><div onClick={handleLandmarkLinkClick} style={{cursor:"pointer", color:"blue"}}>{landmarks.length===0?"No landmarks":landmarks[0]}, ...</div></WCol>
+        <WCol size="3" ><div onClick={handleLandmarkLinkClick} style={{cursor:"pointer", color:"blue"}}>{landmarks.length===0?"No landmarks":landmarks[0][0]}, ...</div></WCol>
         {showDeleteRegion && <DeleteRegion deleteRegion={handleDeleteRegion} deleteRegionName={name} setShowDeleteRegion={toggleShowDeleteRegion} />}
     </WRow>
     );

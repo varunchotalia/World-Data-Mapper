@@ -18,15 +18,16 @@ const regionSchema = new Schema(
             type: String,
             required: true
         },
-        landmarks: {
-            type: [String],
-            required: true
-        },
+        landmarks: [[String]],
+        // {
+        //     type: String,
+        //     required: true
+        // },
         parent: {
             type: String,
             required: true
         }
-    }    
+    }
 );
 
 const Region = model('Region', regionSchema);

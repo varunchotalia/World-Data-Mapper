@@ -26,7 +26,7 @@ const mapSchema = new Schema(
 			required: true
 		}
     },
-    { timestamps: true}
+    { timestamps: true},
 );
 
 const Map = model('Map', mapSchema);

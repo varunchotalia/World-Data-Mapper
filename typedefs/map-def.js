@@ -14,9 +14,8 @@ const typeDefs = gql `
             name: String!
             capital: String!
             leader: String!
-            landmarks: [String!]!
+            landmarks: [[String!]]!
             parent: String!
-            
         }
         extend type Query {
             getAllMaps: [Map]
@@ -29,6 +28,7 @@ const typeDefs = gql `
             updateMapField(_id: String!, field:String!, value:String!): String
             updateRegionField( _id: String!, regionId: String!, field: String!, value: String!): [Region]
             sortRegions(_id: String!, criteria: String!): [Region]
+            addLandmark(_id: String!, regionId: String!, value: [[String!]]!): [Region]
         }
         input FieldInput {
             _id: String
@@ -48,7 +48,7 @@ const typeDefs = gql `
             name: String
             capital: String
             leader: String
-            landmarks: [String]
+            landmarks: [[String]]
             parent: String
         }
 `;

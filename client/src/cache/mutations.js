@@ -70,6 +70,19 @@ export const UPDATE_REGION_FIELD = gql`
 	}
 `;
 
+export const ADD_LANDMARK = gql`
+	mutation AddLandmark($_id: String!, $regionId: String!, $value: [[String!]]!) {
+		addLandmark(_id: $_id, regionId: $regionId, value: $value) {
+			_id
+			name
+			leader
+			capital
+			landmarks
+			parent
+		}
+	}
+`;
+
 export const ADD_MAP = gql`
 	mutation AddMap($map: MapInput!) {
 		addMap(map: $map) {
